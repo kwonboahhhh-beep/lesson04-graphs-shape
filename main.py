@@ -269,7 +269,66 @@ st.text_area(
 st.divider()
 
 # ------------------------------------------------------------------
-# 구역 8. (다음 그래프를 위한 빈 자리)
+# 구역 8. 국산 영화 vs 외국 영화, 평균 총 관객
 # ------------------------------------------------------------------
-st.header("8. 다음 그래프")
+st.header("8. 국산 영화 vs 외국 영화, 평균 총 관객")
+st.caption("나만의 질문: 국산 영화와 외국 영화 중 어느 쪽이 평균 총 관객이 더 많을까?")
+
+# nation에 '한국'이 포함되면 국산, 아니면 외국으로 분류
+df["nation_group"] = df["nation"].astype(str).apply(
+    lambda x: "국산" if "한국" in x else "외국"
+)
+
+nation_group_stats = (
+    df.groupby("nation_group")["total_audi"]
+    .agg(평균관객="mean", 영화편수="count")
+    .reset_index()
+)
+
+fig_nation = px.bar(
+    nation_group_stats,
+    x="nation_group",
+    y="평균관객",
+    custom_data=["영화편수"],
+)
+fig_nation.update_traces(
+    hovertemplate=(
+        "%{x}<br>평균 총 관객: %{y:,.0f}명<br>영화 편수: %{customdata[0]}편<extra></extra>"
+    ),
+)
+fig_nation.update_layout(
+    margin=dict(t=20, b=20, l=20, r=20),
+    xaxis_title="",
+    yaxis_title="평균 총 관객",
+)
+
+st.plotly_chart(fig_nation, use_container_width=True)
+
+# 국산/외국 중 평균 총 관객이 더 많은 쪽을 자동으로 계산
+domestic_avg = nation_group_stats.loc[
+    nation_group_stats["nation_group"] == "국산", "평균관객"
+].values[0]
+foreign_avg = nation_group_stats.loc[
+    nation_group_stats["nation_group"] == "외국", "평균관객"
+].values[0]
+
+if domestic_avg > foreign_avg:
+    higher, lower, higher_avg, lower_avg = "국산", "외국", domestic_avg, foreign_avg
+else:
+    higher, lower, higher_avg, lower_avg = "외국", "국산", foreign_avg, domestic_avg
+
+diff_ratio = (higher_avg / lower_avg - 1) * 100
+
+st.markdown(
+    f"💡 **{higher}** 영화의 평균 총 관객이 **{higher_avg:,.0f}명**으로, "
+    f"**{lower}** 영화의 평균 총 관객 **{lower_avg:,.0f}명**보다 "
+    f"약 **{diff_ratio:.0f}%** 더 많습니다."
+)
+
+st.divider()
+
+# ------------------------------------------------------------------
+# 구역 9. (다음 그래프를 위한 빈 자리)
+# ------------------------------------------------------------------
+st.header("9. 다음 그래프")
 st.info("이 자리에는 다음 그래프가 추가될 예정입니다.")
