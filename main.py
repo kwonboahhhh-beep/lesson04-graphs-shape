@@ -65,7 +65,34 @@ st.text_area(
 st.divider()
 
 # ------------------------------------------------------------------
-# 구역 2. (다음 그래프를 위한 빈 자리)
+# 구역 2. 장르 안 영화별 총 관객 트리맵
 # ------------------------------------------------------------------
-st.header("2. 다음 그래프")
+st.header("2. 장르 안 영화별 총 관객")
+
+fig_treemap = px.treemap(
+    df,
+    path=[px.Constant("전체"), "genre", "movieNm"],
+    values="total_audi",
+)
+fig_treemap.update_traces(
+    hovertemplate="%{label}<br>총 관객: %{value:,}명<extra></extra>",
+)
+fig_treemap.update_layout(
+    margin=dict(t=20, b=20, l=20, r=20),
+)
+
+st.plotly_chart(fig_treemap, use_container_width=True)
+
+st.text_area(
+    "💡 이 그래프로 알 수 있는 것",
+    placeholder="예: ○○ 장르 안에서는 ○○○ 한 편이 총 관객의 큰 비중을 차지한다.",
+    key="insight_2",
+)
+
+st.divider()
+
+# ------------------------------------------------------------------
+# 구역 3. (다음 그래프를 위한 빈 자리)
+# ------------------------------------------------------------------
+st.header("3. 다음 그래프")
 st.info("이 자리에는 다음 그래프가 추가될 예정입니다.")
